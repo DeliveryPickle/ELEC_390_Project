@@ -1,29 +1,51 @@
 import pandas as pd
 from matplotlib import pyplot as plt
 
-# should use 5s windows
-dataset = pd.read_csv('Lucas/JumpingArmsDown.csv')
+import data_split
 
-# need 10+ features total
-#features = pd.DataFrame(columns=['maximum', 'minimum', 'range', 'mean', 'median', 'variance', 'skewness'])
-features = pd.DataFrame(columns=['maximum', 'minimum', 'mean', 'median', 'variance', 'skewness', 'standard deviation'])
-window_size = 100
-# using absolute acceleration column only
-features['maximum'] = dataset.iloc[:, 4].rolling(window=window_size).max()
-features['minimum'] = dataset.iloc[:, 4].rolling(window=window_size).min()
-#features['range'] = dataset.iloc[:, 4].rolling(window=window_size).range() # this is not a function/there is no range function?
-                                                                            # might need to take difference of max and min columns to get range?
-features['mean'] = dataset.iloc[:, 4].rolling(window=window_size).mean()
-features['median'] = dataset.iloc[:, 4].rolling(window=window_size).median()
-features['variance'] = dataset.iloc[:, 4].rolling(window=window_size).var()
-features['skewness'] = dataset.iloc[:, 4].rolling(window=window_size).skew()
-features['standard deviation'] = dataset.iloc[:, 4].rolling(window=window_size).std()
-features = features.dropna()
-print(features)
 
-fig, ax = plt.subplots(figsize=(10, 10))
-x = [x for x in range(features['maximum'].size)]
-ax.plot(x, features['standard deviation'])
-ax.set_xlabel('Number of the Window')
-ax.set_ylabel('Value of the std')
-plt.show()
+# returns a new DataFrame of extracted features
+def extract_features(data):
+    window_size = 31
+    # need 10+ features total !!!
+    features = pd.DataFrame(columns=['maximum', 'minimum', 'range', 'mean', 'median', 'variance', 'skewness', 'standard deviation'])
+    # using absolute acceleration column only
+    features['maximum'] = data.iloc[:, 4].rolling(window=window_size).max()
+    features['minimum'] = data.iloc[:, 4].rolling(window=window_size).min()
+    features['range'] = features['maximum'] - features['minimum']
+    features['mean'] = data.iloc[:, 4].rolling(window=window_size).mean()
+    features['median'] = data.iloc[:, 4].rolling(window=window_size).median()
+    features['variance'] = data.iloc[:, 4].rolling(window=window_size).var()
+    features['skewness'] = data.iloc[:, 4].rolling(window=window_size).skew()
+    features['standard deviation'] = data.iloc[:, 4].rolling(window=window_size).std()
+    features = features.dropna()
+    return features
+
+
+# for loop to run extract_features iterating through array of 5s window DataFrames
+def iterate_extract(data):
+    features = []
+    for window in data:
+        temp = extract_features(window)
+        if len(temp.index) > 0:
+            features.append(temp)
+    return features
+
+
+def feature_extraction(dataset):
+    data_features = iterate_extract(dataset)
+    num_data_windows = len(data_features)  # number of 5s windows
+
+    fig, axs = plt.subplots(nrows=num_data_windows, figsize=(20, 10))
+    colors = ['red', 'yellow', 'blue', 'green', 'pink', 'purple']
+    prev_len = 0
+    for i in range(num_data_windows):
+        curr_len = len(data_features[i])
+        x = [x for x in range(prev_len, prev_len + curr_len)]
+        axs[i].plot(x, data_features[i]['range'], c=colors[i % 6])
+        prev_len = prev_len + curr_len
+    plt.show()
+
+
+test = data_split.data_split(pd.read_csv('Lucas/WalkingArmsDown.csv'))
+feature_extraction(test)
