@@ -31,17 +31,17 @@ for i in filePath:
     Elise_matrix = pd.read_csv("Elise/" + i)
     temp = data_split(Elise_matrix)
     for j in range(len(temp)):
-        j = temp[j]
-        if len(j) < window_size:
+        data = temp[j]
+        if len(data) > window_size:
             # fig, ax = plt.subplots(2, 2)
             # j.plot(x="Time (s)", ax=ax.flatten()[0:5], subplots=True, sharex=False)
-            # fig.suptitle('Elise' + str(i) + '(Unfiltered)', fontsize=12)
+            # fig.suptitle('Elise' + str(i) + ' (Unfiltered)', fontsize=12)
 
             # Moving Average Filter
-            Elise_data_sma = j.rolling(window_size).mean()
+            # Elise_data_sma = data.rolling(window_size).mean()
             # fig, ax = plt.subplots(2, 2)
             # Elise_data_sma.plot(x="Time (s)", ax=ax.flatten()[0:5], subplots=True, sharex=False)
-            # fig.suptitle('Elise' + str(i) + '(Unfiltered)', fontsize=12)
+            # fig.suptitle('Elise' + str(i) + ' (Filtered)', fontsize=12)
 
             # Normalization
             Elise_data_normalized = Elise_data_sma.copy()
@@ -56,17 +56,17 @@ for i in filePath:
     Simon_matrix = pd.read_csv("Simon/" + i)
     temp = data_split(Simon_matrix)
     for j in range(len(temp)):
-        j = temp[j]
-        if len(j) > window_size:
+        data = temp[j]
+        if len(data) > window_size:
             # fig, ax = plt.subplots(2, 2)
             # j.plot(x="Time (s)", ax=ax.flatten()[0:5], subplots=True, sharex=False)
-            # fig.suptitle('Simon' + str(i) + '(Unfiltered)', fontsize=12)
+            # fig.suptitle('Simon' + str(i) + ' (Unfiltered)', fontsize=12)
 
             # Moving Average Filter
-            Simon_data_sma = j.rolling(window_size).mean()
+            Simon_data_sma = data.rolling(window_size).mean()
             # fig, ax = plt.subplots(2, 2)
             # Simon_data_sma.plot(x="Time (s)", ax=ax.flatten()[0:5], subplots=True, sharex=False)
-            # fig.suptitle('Simon' + str(i) + '(Unfiltered)', fontsize=12)
+            # fig.suptitle('Simon' + str(i) + ' (Filtered)', fontsize=12)
 
             # Normalization
             Simon_data_normalized = Simon_data_sma.copy()
@@ -81,17 +81,17 @@ for i in filePath:
     Lucas_matrix = pd.read_csv("Lucas/" + i)
     temp = data_split(Lucas_matrix)
     for j in range(len(temp)):
-        j = temp[j]
-        if len(j) > window_size:
+        data = temp[j]
+        if len(data) > window_size:
             # fig, ax = plt.subplots(2, 2)
             # j.plot(x="Time (s)", ax=ax.flatten()[0:5], subplots=True, sharex=False)
-            # fig.suptitle('Lucas' + str(i) + '(Unfiltered)', fontsize=12)
+            # fig.suptitle('Lucas' + str(i) + ' (Unfiltered)', fontsize=12)
 
             # Moving Average Filter
-            Lucas_data_sma = j.rolling(window_size).mean()
+            Lucas_data_sma = data.rolling(window_size).mean()
             # fig, ax = plt.subplots(2, 2)
             # Lucas_data_sma.plot(x="Time (s)", ax=ax.flatten()[0:5], subplots=True, sharex=False)
-            # fig.suptitle('Lucas' + str(i) + '(Unfiltered)', fontsize=12)
+            # fig.suptitle('Lucas' + str(i) + ' (Filtered)', fontsize=12)
 
             # Normalization
             Lucas_data_normalized = Lucas_data_sma.copy()
