@@ -1,6 +1,8 @@
 import pandas as pd
+from matplotlib import pyplot as plt
 from sklearn.decomposition import PCA
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay, roc_curve, RocCurveDisplay, \
+    roc_auc_score, f1_score
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
@@ -31,9 +33,26 @@ def classify(data, classification):
     clf = make_pipeline(scaler, l_reg)
     clf.fit(X_train, y_train)
     y_pred = clf.predict(X_test)
-    y_clf_pred = clf.predict_proba(X_test)
+    y_clf_prob = clf.predict_proba(X_test)
+    print('y_pred is: ', y_pred)
+    print('y_clf_prob is: ', y_clf_prob)
+
+    cm = confusion_matrix(y_test, y_pred)
+    cm_display = ConfusionMatrixDisplay(cm).plot()
+
+    fpr, tpr, _ = roc_curve(y_test, y_clf_prob[:, 1], pos_label=clf.classes_[1])
+    roc_display = RocCurveDisplay(fpr=fpr, tpr=tpr).plot()
+
     acc = accuracy_score(y_test, y_pred)
-    print("Accuracy: ", acc)
+    print('accuracy is: ', acc)
+
+    auc = roc_auc_score(y_test, y_clf_prob[:, 1])
+    print('the AUC is: ', auc)
+
+    F1 = f1_score(y_test, y_pred)
+    print('the F1 score is: ', F1)
+
+    plt.show()
 
 
 # old test code
@@ -70,33 +89,9 @@ def old_test():
     classify(test_features, test_class)
 
 
-# walk = data_split.data_split(pd.read_csv('Lucas/WalkingArmsDown.csv'))
-# jump = data_split.data_split(pd.read_csv('Lucas/JumpingArmsDown.csv'))
-#
-# df = pd.DataFrame(columns=['maximum', 'minimum', 'range', 'mean', 'median',
-#                                      'variance', 'skewness', 'standard deviation',
-#                                      'kurtosis', 'class'])
-# walk_features = feature_extraction.feature_extraction(walk)
-# jump_features = feature_extraction.feature_extraction(jump)
-# for window in walk_features:
-#     window['type'] = 0
-#     df = pd.concat([df, window])
-# for window in jump_features:
-#     window['type'] = 1
-#     df = pd.concat([df, window])
-#
-# classify(df.iloc[:, :-1], df.iloc[:, -1].astype('int'))
-
-# df1, df2, df3 = PreProcessing.preprocess()
-# print(df1)
-# df = pd.concat([df1, df2, df3])
-# df = df.dropna()
 dataset = PreProcessing.preprocess()
-#df = df.dropna()
-# print(dataset)
 dataset_features = feature_extraction.feature_extraction(dataset)
 df = pd.DataFrame()
 for i in dataset_features:
     df = pd.concat([df, i])
-print(df)
 classify(df.iloc[:, :-1], df.loc[:, 'type'].astype('int'))
