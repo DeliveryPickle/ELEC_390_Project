@@ -53,13 +53,13 @@ testing = output[math.floor(len(output)*0.9):] # from 90% to the end of the shuf
 # print(training, '\n')
 # print(testing)
 
-with h5py.File('./ELEC390_Data.h5', 'w') as hdf:
-    Data = hdf.create_group('/Dataset')
-    Training = Data.create_group('Training')
-    for i in range(0, len(training)):
-        #print(training[i])
-        Training.create_dataset('Training Data '+str(i), data=training[i])
-
-    Testing = Data.create_group('Testing')
-    for i in range(0, len(testing)):
-        Testing.create_dataset('Testing Data '+str(i), data=testing[i])
+# with h5py.File('./ELEC390_Data.h5', 'w') as hdf:
+#     Data = hdf.create_group('/Dataset')
+#     Training = Data.create_group('Training')
+#     for i in range(0, len(training)):
+#         #print(training[i])
+#         Training.create_dataset('Training Data '+str(i), data=training[i])
+#
+#     Testing = Data.create_group('Testing')
+#     for i in range(0, len(testing)):
+#         Testing.create_dataset('Testing Data '+str(i), data=testing[i])
