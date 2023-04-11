@@ -1,6 +1,5 @@
 import pandas as pd
 from matplotlib import pyplot as plt
-from sklearn.decomposition import PCA
 from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay, roc_curve, RocCurveDisplay, \
     roc_auc_score, f1_score
 from sklearn.model_selection import train_test_split
@@ -9,7 +8,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 
 import PreProcessing
-import data_split
 import feature_extraction
 
 
@@ -70,17 +68,9 @@ def classify_input(input_data):
     clf = make_pipeline(scaler, l_reg)
     clf.fit(X_train, y_train)
     y_pred = clf.predict(all_input.drop('Time (s)', axis=1))
-    print('y_pred is: ', y_pred)
     for i in range(len(all_input)):
         all_input['type'] = y_pred
-    # print(all_input)
-    # output = data_split.data_split(all_input)
-    # print(output)
     return all_input
-
-t1 = pd.read_csv('Input/TestEliseWalkingBackPocket.csv')
-# t1 = pd.concat([t1, pd.read_csv('Input/TestEliseJumpingArmsDown.csv')])
-classify_input(t1)
 
 
 def test():
@@ -90,18 +80,3 @@ def test():
     for i in dataset_features:
         df = pd.concat([df, i])
     classify(df.iloc[:, :-1], df.loc[:, 'type'].astype('int'))
-
-
-# test()
-
-# pp window | fe window |   acc |   auc |   f1
-#   57      |   57      | .656  | .658  | .449
-#   57      |   31      | .645  | .633  | .403
-#   57      |   71      | .648  | .652  | .430
-#   31      |   57      | .660  | .685  | .487
-#   71      |   57      | .633  | .614  | .351
-#   31      |   31      | .209  | .590  | .273
-#   71      |   71      | .627  | .622  | .340
-
-# classifier -> 0 test size + input csv arg
-# output -> df window + type per window

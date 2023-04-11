@@ -1,8 +1,6 @@
 import pandas as pd
 from matplotlib import pyplot as plt
 
-import data_split
-
 
 # returns a new DataFrame of extracted features
 def extract_features(data):
@@ -10,7 +8,7 @@ def extract_features(data):
     # need 10+ features total !!!
     features = pd.DataFrame(columns=['Time (s)', 'maximum', 'minimum', 'range', 'mean', 'median',
                                      'variance', 'skewness', 'standard deviation',
-                                     'kurtosis', 'type'])
+                                     'kurtosis', 'absolute acceleration', 'type'])
     # using absolute acceleration column only
     features['maximum'] = data.iloc[:, 4].rolling(window=window_size).max()
     features['minimum'] = data.iloc[:, 4].rolling(window=window_size).min()
@@ -21,6 +19,7 @@ def extract_features(data):
     features['skewness'] = data.iloc[:, 4].rolling(window=window_size).skew()
     features['standard deviation'] = data.iloc[:, 4].rolling(window=window_size).std()
     features['kurtosis'] = data.iloc[:, 4].rolling(window=window_size).kurt()
+    features['absolute acceleration'] = data.iloc[window_size-1:, 4]
     if 'type' in data.columns:
         features = features.drop('Time (s)', axis=1)
         features['type'] = data.loc[window_size-1:, 'type']
@@ -61,7 +60,3 @@ def plot_feature_extraction(dataset, feature):
         axs[i].plot(x, data_features[i][feature], c=colors[i % 6])
         prev_len = prev_len + curr_len
     plt.show()
-
-
-# test = data_split.data_split(pd.read_csv('Lucas/WalkingArmsDown.csv'))
-# test_features = feature_extraction(test)
