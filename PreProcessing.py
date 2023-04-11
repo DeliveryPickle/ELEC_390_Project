@@ -25,16 +25,17 @@ def data_split(data):
         i = j
     return outList
 
-# Preprocessing
-filePath = ["WalkingFrontPocket.csv", "WalkingBackPocket.csv", "WalkingCoatPocket.csv", "WalkingArmsUp.csv", "WalkingArmsDown.csv", "JumpingFrontPocket.csv", "JumpingBackPocket.csv", "JumpingCoatPocket.csv", "JumpingArmsUp.csv", "JumpingArmsDown.csv"]
-Elise_matrix = {}
-Simon_matrix = {}
-Lucas_matrix = {}
-
-window_size = 57
-
+window_size = 31
 
 def preprocess():
+    # Preprocessing
+    filePath = ["WalkingFrontPocket.csv", "WalkingBackPocket.csv", "WalkingCoatPocket.csv", "WalkingArmsUp.csv",
+                "WalkingArmsDown.csv", "JumpingFrontPocket.csv", "JumpingBackPocket.csv", "JumpingCoatPocket.csv",
+                "JumpingArmsUp.csv", "JumpingArmsDown.csv"]
+    Elise_matrix = {}
+    Simon_matrix = {}
+    Lucas_matrix = {}
+
     all_data = []
     for i in filePath:
         if 'walking' in i.lower():
@@ -127,3 +128,16 @@ def preprocess():
                 all_data.append(Lucas_data_normalized)
 
     return all_data
+
+
+def preprocess_input(input_data):
+    temp = data_split(input_data)
+    all_input_data = []
+    for j in range(len(temp)):
+        data = temp[j]
+        if len(data) > window_size:
+            input_data_sma = data.rolling(window_size).mean()
+            input_data_normalized = input_data_sma.copy()
+            input_data_normalized = (input_data_normalized - input_data_normalized.min()) / (input_data_normalized.max() - input_data_normalized.min())
+            all_input_data.append(input_data_normalized)
+    return all_input_data

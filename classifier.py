@@ -20,16 +20,6 @@ def classify(data, classification):
     scaler = StandardScaler()
     l_reg = LogisticRegression(max_iter=10000)
 
-    # pca = PCA(n_components=2)
-    # pca_pipe = make_pipeline(scaler, pca)
-    # X_train_pca = pca_pipe.fit_transform(X_train)
-    # X_test_pca = pca_pipe.fit_transform(X_test)
-    # clf = make_pipeline(l_reg)
-    # clf.fit(X_train_pca, y_train)
-    # y_pred_pca = clf.predict(X_test_pca)
-    # acc = accuracy_score(y_test, y_pred_pca)
-    # print('accuracy is: ', acc)
-
     clf = make_pipeline(scaler, l_reg)
     clf.fit(X_train, y_train)
     y_pred = clf.predict(X_test)
@@ -55,43 +45,62 @@ def classify(data, classification):
     plt.show()
 
 
-# old test code
-# don't use
-# preserved as function just in case
-def old_test():
-    test = []
-    walk = data_split.data_split(pd.read_csv('Lucas/WalkingArmsDown.csv'))
-    jump = data_split.data_split(pd.read_csv('Lucas/JumpingArmsDown.csv'))
-    for window in walk:
-        test.append(window)
-    for window in jump:
-        test.append(window)
+def classify_input(input_data):
+    training_pp = PreProcessing.preprocess()
+    training_features = feature_extraction.feature_extraction(training_pp)
+    all_training = pd.DataFrame()
+    for window in training_features:
+        all_training = pd.concat([all_training, window])
 
-    test_class = []
+    input_pp = PreProcessing.preprocess_input(input_data)
+    input_features = feature_extraction.feature_extraction(input_pp)
+    all_input = pd.DataFrame()
+    for window in input_features:
+        all_input = pd.concat([all_input, window])
 
-    window_size = 31
+    # shuffle dataset
+    all_training = all_training.sample(frac=1).reset_index(drop=True)
 
-    for window in walk:
-        if (len(window) - window_size + 1) > 0:
-            test_class.append(0)
+    X_train = all_training.iloc[:, :-1]
+    y_train = all_training.iloc[:, -1]
 
-    for window in jump:
-        if (len(window) - window_size + 1) > 0:
-            test_class.append(1)
+    scaler = StandardScaler()
+    l_reg = LogisticRegression(max_iter=10000)
 
-    # walk = 0
-    # jump = 1
-    print(test_class)
+    clf = make_pipeline(scaler, l_reg)
+    clf.fit(X_train, y_train)
+    y_pred = clf.predict(all_input.drop('Time (s)', axis=1))
+    print('y_pred is: ', y_pred)
+    for i in range(len(all_input)):
+        all_input['type'] = y_pred
+    # print(all_input)
+    output = data_split.data_split(all_input)
+    print(output)
 
-    test_features = feature_extraction.feature_extraction(test)
-    print(test_features)
+# t1 = pd.read_csv('Input/TestEliseWalkingBackPocket.csv')
+# t1 = pd.concat([t1, pd.read_csv('Input/TestEliseJumpingArmsDown.csv')])
+# classify_input(t1)
 
-    classify(test_features, test_class)
+
+def test():
+    dataset = PreProcessing.preprocess()
+    dataset_features = feature_extraction.feature_extraction(dataset)
+    df = pd.DataFrame()
+    for i in dataset_features:
+        df = pd.concat([df, i])
+    classify(df.iloc[:, :-1], df.loc[:, 'type'].astype('int'))
 
 
-dataset = PreProcessing.preprocess()
-dataset_features = feature_extraction.feature_extraction(dataset)
-df = pd.DataFrame()
-for i in dataset_features:
-    df = pd.concat([df, i])
-classify(df.iloc[:, :-1], df.loc[:, 'type'].astype('int'))
+test()
+
+# pp window | fe window |   acc |   auc |   f1
+#   57      |   57      | .656  | .658  | .449
+#   57      |   31      | .645  | .633  | .403
+#   57      |   71      | .648  | .652  | .430
+#   31      |   57      | .660  | .685  | .487
+#   71      |   57      | .633  | .614  | .351
+#   31      |   31      | .209  | .590  | .273
+#   71      |   71      | .627  | .622  | .340
+
+# classifier -> 0 test size + input csv arg
+# output -> df window + type per window

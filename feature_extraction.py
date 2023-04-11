@@ -6,9 +6,9 @@ import data_split
 
 # returns a new DataFrame of extracted features
 def extract_features(data):
-    window_size = 31
+    window_size = 57
     # need 10+ features total !!!
-    features = pd.DataFrame(columns=['maximum', 'minimum', 'range', 'mean', 'median',
+    features = pd.DataFrame(columns=['Time (s)', 'maximum', 'minimum', 'range', 'mean', 'median',
                                      'variance', 'skewness', 'standard deviation',
                                      'kurtosis', 'type'])
     # using absolute acceleration column only
@@ -21,7 +21,12 @@ def extract_features(data):
     features['skewness'] = data.iloc[:, 4].rolling(window=window_size).skew()
     features['standard deviation'] = data.iloc[:, 4].rolling(window=window_size).std()
     features['kurtosis'] = data.iloc[:, 4].rolling(window=window_size).kurt()
-    features['type'] = data.loc[:, 'type']
+    if 'type' in data.columns:
+        features = features.drop('Time (s)', axis=1)
+        features['type'] = data.loc[window_size-1:, 'type']
+    else:
+        features = features.drop('type', axis=1)
+        features['Time (s)'] = data.iloc[window_size-1:, 0]
     features = features.dropna()
     return features
 
