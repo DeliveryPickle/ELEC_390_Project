@@ -25,16 +25,12 @@ def data_split(data):
         i = j
     return outList
 
-# Preprocessing
-filePath = ["WalkingFrontPocket.csv", "WalkingBackPocket.csv", "WalkingCoatPocket.csv", "WalkingArmsUp.csv", "WalkingArmsDown.csv", "JumpingFrontPocket.csv", "JumpingBackPocket.csv", "JumpingCoatPocket.csv", "JumpingArmsUp.csv", "JumpingArmsDown.csv"]
-Elise_matrix = {}
-Simon_matrix = {}
-Lucas_matrix = {}
-
-window_size = 57
-
 
 def preprocess():
+    # Preprocessing
+    filePath = ["WalkingFrontPocket.csv", "WalkingBackPocket.csv", "WalkingCoatPocket.csv", "WalkingArmsUp.csv", "WalkingArmsDown.csv", "JumpingFrontPocket.csv", "JumpingBackPocket.csv", "JumpingCoatPocket.csv", "JumpingArmsUp.csv", "JumpingArmsDown.csv"]
+
+    window_size = 31
     all_data = []
     for i in filePath:
         if 'walking' in i.lower():
@@ -58,7 +54,8 @@ def preprocess():
 
                 # Normalization
                 Elise_data_normalized = Elise_data_sma.copy()
-                Elise_data_normalized = (Elise_data_normalized - Elise_data_normalized.min()) / (Elise_data_normalized.max() - Elise_data_normalized.min())
+                columns = ["Linear Acceleration x (m/s^2)", "Linear Acceleration y (m/s^2)", "Linear Acceleration z (m/s^2)", "Absolute acceleration (m/s^2)"]
+                Elise_data_normalized[columns] = (Elise_data_normalized[columns] - Elise_data_normalized[columns].min()) / (Elise_data_normalized[columns].max() - Elise_data_normalized[columns].min())
                 # fig, ax = plt.subplots(2, 2)
                 # Elise_data_normalized.plot(x="Time (s)", ax=ax.flatten()[0:5], subplots=True, sharex=False)
                 # fig.suptitle('Normalized Elise ' + str(i) + ' (SMA 71)', fontsize=12)
@@ -88,11 +85,13 @@ def preprocess():
 
                 # Normalization
                 Simon_data_normalized = Simon_data_sma.copy()
-                Simon_data_normalized = (Simon_data_normalized - Simon_data_normalized.min()) / (Simon_data_normalized.max() - Simon_data_normalized.min())
-                # fig, ax = plt.subplots(2, 2)
-                # Simon_data_normalized.plot(x="Time (s)", ax=ax.flatten()[0:5], subplots=True, sharex=False)
-                # fig.suptitle('Normalized Simon ' + str(i) + ' (SMA 71)', fontsize=12)
-                # plt.show()
+                columns = ["Linear Acceleration x (m/s^2)", "Linear Acceleration y (m/s^2)", "Linear Acceleration z (m/s^2)", "Absolute acceleration (m/s^2)"]
+                Simon_data_normalized[columns] = (Simon_data_normalized[columns] - Simon_data_normalized[columns].min()) / (Simon_data_normalized[columns].max() - Simon_data_normalized[columns].min())
+                fig, ax = plt.subplots(2, 2)
+                Simon_data_normalized.plot(x="Time (s)", ax=ax.flatten()[0:5], subplots=True, sharex=False)
+                fig.suptitle('Normalized Simon ' + str(i) + ' (SMA 71)', fontsize=12)
+                plt.show()
+
                 Simon_data_normalized['type'] = t
                 all_data.append(Simon_data_normalized)
 
@@ -118,12 +117,15 @@ def preprocess():
 
                 # Normalization
                 Lucas_data_normalized = Lucas_data_sma.copy()
-                Lucas_data_normalized = (Lucas_data_normalized - Lucas_data_normalized.min()) / (Lucas_data_normalized.max() - Lucas_data_normalized.min())
+                columns = ["Linear Acceleration x (m/s^2)", "Linear Acceleration y (m/s^2)", "Linear Acceleration z (m/s^2)", "Absolute acceleration (m/s^2)"]
+                Lucas_data_normalized[columns] = (Lucas_data_normalized[columns] - Lucas_data_normalized[columns].min()) / (Lucas_data_normalized[columns].max() - Lucas_data_normalized[columns].min())
                 # fig, ax = plt.subplots(2, 2)
                 # Lucas_data_normalized.plot(x="Time (s)", ax=ax.flatten()[0:5], subplots=True, sharex=False)
                 # fig.suptitle('Normalized Lucas ' + str(i) + ' (SMA 71)', fontsize=12)
                 # plt.show()
                 Lucas_data_normalized['type'] = t
                 all_data.append(Lucas_data_normalized)
-
     return all_data
+
+
+preprocess()
