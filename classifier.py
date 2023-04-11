@@ -74,12 +74,13 @@ def classify_input(input_data):
     for i in range(len(all_input)):
         all_input['type'] = y_pred
     # print(all_input)
-    output = data_split.data_split(all_input)
-    print(output)
+    # output = data_split.data_split(all_input)
+    # print(output)
+    return all_input
 
-# t1 = pd.read_csv('Input/TestEliseWalkingBackPocket.csv')
+t1 = pd.read_csv('Input/TestEliseWalkingBackPocket.csv')
 # t1 = pd.concat([t1, pd.read_csv('Input/TestEliseJumpingArmsDown.csv')])
-# classify_input(t1)
+classify_input(t1)
 
 
 def test():
@@ -91,7 +92,7 @@ def test():
     classify(df.iloc[:, :-1], df.loc[:, 'type'].astype('int'))
 
 
-test()
+# test()
 
 # pp window | fe window |   acc |   auc |   f1
 #   57      |   57      | .656  | .658  | .449

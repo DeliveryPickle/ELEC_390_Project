@@ -4,12 +4,10 @@ import math
 import pandas as pd
 
 
-def data_split(data):
-    # if type == 'walking':
-    #     data['type'] = 0
-    # elif type == 'jumping':
-    #     data['type'] = 1
+window_size = 31
 
+
+def data_split(data):
     outList = []
     gap = 0
     i = 1
@@ -25,12 +23,10 @@ def data_split(data):
         i = j
     return outList
 
-
 def preprocess():
     # Preprocessing
     filePath = ["WalkingFrontPocket.csv", "WalkingBackPocket.csv", "WalkingCoatPocket.csv", "WalkingArmsUp.csv", "WalkingArmsDown.csv", "JumpingFrontPocket.csv", "JumpingBackPocket.csv", "JumpingCoatPocket.csv", "JumpingArmsUp.csv", "JumpingArmsDown.csv"]
 
-    window_size = 31
     all_data = []
     for i in filePath:
         if 'walking' in i.lower():
@@ -87,10 +83,10 @@ def preprocess():
                 Simon_data_normalized = Simon_data_sma.copy()
                 columns = ["Linear Acceleration x (m/s^2)", "Linear Acceleration y (m/s^2)", "Linear Acceleration z (m/s^2)", "Absolute acceleration (m/s^2)"]
                 Simon_data_normalized[columns] = (Simon_data_normalized[columns] - Simon_data_normalized[columns].min()) / (Simon_data_normalized[columns].max() - Simon_data_normalized[columns].min())
-                fig, ax = plt.subplots(2, 2)
-                Simon_data_normalized.plot(x="Time (s)", ax=ax.flatten()[0:5], subplots=True, sharex=False)
-                fig.suptitle('Normalized Simon ' + str(i) + ' (SMA 71)', fontsize=12)
-                plt.show()
+                # fig, ax = plt.subplots(2, 2)
+                # Simon_data_normalized.plot(x="Time (s)", ax=ax.flatten()[0:5], subplots=True, sharex=False)
+                # fig.suptitle('Normalized Simon ' + str(i) + ' (SMA 71)', fontsize=12)
+                # plt.show()
 
                 Simon_data_normalized['type'] = t
                 all_data.append(Simon_data_normalized)
@@ -127,5 +123,17 @@ def preprocess():
                 all_data.append(Lucas_data_normalized)
     return all_data
 
+def preprocess_input(input_data):
+    temp = data_split(input_data)
+    all_inputs = []
+    for j in range(len(temp)):
+        data = temp[j]
+        if len(data) > window_size:
+            input_data_sma = data.rolling(window_size).mean()
+            input_data_normalized = input_data_sma.copy()
+            columns = ["Linear Acceleration x (m/s^2)", "Linear Acceleration y (m/s^2)",
+                       "Linear Acceleration z (m/s^2)", "Absolute acceleration (m/s^2)"]
+            input_data_normalized[columns] = (input_data_normalized[columns] - input_data_normalized[columns].min()) / (input_data_normalized[columns].max() - input_data_normalized[columns].min())
+            all_inputs.append(input_data_normalized)
+    return all_inputs
 
-preprocess()
