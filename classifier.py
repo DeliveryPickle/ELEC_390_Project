@@ -1,8 +1,9 @@
+import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay, roc_curve, RocCurveDisplay, \
     roc_auc_score, f1_score
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, ShuffleSplit, LearningCurveDisplay
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
@@ -11,6 +12,7 @@ import PreProcessing
 import feature_extraction
 
 
+# test model with 90:10 train/test split
 def classify(data, classification):
     X_train, X_test, y_train, y_test = \
         train_test_split(data, classification, test_size=0.1, shuffle=True, random_state=0)
@@ -31,6 +33,23 @@ def classify(data, classification):
     fpr, tpr, _ = roc_curve(y_test, y_clf_prob[:, 1], pos_label=clf.classes_[1])
     roc_display = RocCurveDisplay(fpr=fpr, tpr=tpr).plot()
 
+    common_params = {
+        "X": data,
+        "y": classification,
+        "train_sizes": np.linspace(0.1, 1.0, 5),
+        "cv": ShuffleSplit(n_splits=50, test_size=0.1, random_state=0),
+        "score_type": "both",
+        "n_jobs": 4,
+        "line_kw": {"marker": "o"},
+        "std_display_style": "fill_between",
+    }
+
+    fig, ax = plt.subplots()
+    LearningCurveDisplay.from_estimator(clf, **common_params, ax=ax)
+    handles, label = ax.get_legend_handles_labels()
+    ax.legend(handles[:2], ["Training Score", "Test Score"])
+    ax.set_title(f"Learning Curve for {clf.__class__.__name__}")
+
     acc = accuracy_score(y_test, y_pred)
     print('accuracy is: ', acc)
 
@@ -43,6 +62,8 @@ def classify(data, classification):
     plt.show()
 
 
+# classify new data from GUI
+# uses all train/test data as training data
 def classify_input(input_data):
     training_pp = PreProcessing.preprocess()
     training_features = feature_extraction.feature_extraction(training_pp)
@@ -73,6 +94,7 @@ def classify_input(input_data):
     return all_input
 
 
+# call this function to test the classifier with 90:10 train/test split
 def test():
     dataset = PreProcessing.preprocess()
     dataset_features = feature_extraction.feature_extraction(dataset)
@@ -80,3 +102,6 @@ def test():
     for i in dataset_features:
         df = pd.concat([df, i])
     classify(df.iloc[:, :-1], df.loc[:, 'type'].astype('int'))
+
+
+# test()

@@ -5,7 +5,6 @@ from matplotlib import pyplot as plt
 # returns a new DataFrame of extracted features
 def extract_features(data):
     window_size = 57
-    # need 10+ features total !!!
     features = pd.DataFrame(columns=['Time (s)', 'maximum', 'minimum', 'range', 'mean', 'median',
                                      'variance', 'skewness', 'standard deviation',
                                      'kurtosis', 'absolute acceleration', 'type'])
